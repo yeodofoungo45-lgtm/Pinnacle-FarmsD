@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#1a2218" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Pinnacle Farms" />
+  <title>Pinnacle Farms</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: Georgia, serif; background: #0f1410; color: #e8ede4; height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
+    button { font-family: Georgia, serif; }
+    ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: #1a2218; } ::-webkit-scrollbar-thumb { background: #3a5a2c; border-radius: 4px; }
+
+    #app { display: flex; flex-direction: column; height: 100dvh; }
+
+    /* TOP BAR */
+    .topbar { background: #1a2218; border-bottom: 1px solid #2d3d2a; padding: 12px 16px; padding-top: max(12px, env(safe-area-inset-top)); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-icon { width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg, #7eb856, #4a8a2c); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .logo-text { font-weight: 700; font-size: 15px; color: #c8e0b8; letter-spacing: 1px; }
+    .status-dot { background: #1e2e1a; border: 1px solid #2d3d2a; border-radius: 8px; padding: 5px 12px; font-size: 12px; color: #9fd878; }
+
+    /* PAGE TITLE */
+    .page-header { padding: 14px 16px 10px; border-bottom: 1px solid #1e2e1a; flex-shrink: 0; }
+    .page-title { font-size: 18px; font-weight: 700; color: #c8e0b8; }
+    .page-date { font-size: 11px; color: #5a7a50; margin-top: 2px; }
+
+    /* CONTENT */
+    .content { flex: 1; overflow-y: auto; padding: 14px 14px 80px; -webkit-overflow-scrolling: touch; }
+
+    /* BOTTOM NAV */
+    .bottomnav { position: fixed; bottom: 0; left: 0; right: 0; background: #1a2218; border-top: 1px solid #2d3d2a; display: flex; padding-bottom: env(safe-area-inset-bottom); z-index: 50; }
+    .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 4px; border: none; background: transparent; cursor: pointer; color: #5a7a50; font-size: 9px; letter-spacing: 0.5px; transition: color 0.2s; position: relative; }
+    .nav-btn.active { color: #9fd878; }
+    .nav-btn .nav-icon { font-size: 20px; }
+    .nav-badge { position: absolute; top: 6px; right: calc(50% - 16px); background: #c0392b; color: #fff; font-size: 9px; padding: 1px 5px; border-radius: 10px; }
+
+    /* CARDS & KPIs */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .grid1 { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 12px; }
+    .kpi { background: #1a2218; border: 1px solid #2d3d2a; border-radius: 14px; padding: 16px; }
+    .kpi-icon { font-size: 20px; margin-bottom: 8px; }
+    .kpi-label { font-size: 11px; color: #6b8a60; margin-bottom: 4px; }
+    .kpi-val { font-size: 24px; font-weight: 700; margin-bottom: 2px; }
+    .kpi-sub { font-size: 10px; color: #4a6a40; }
+    .card { background: #1a2218; border: 1px solid #2d3d2a; border-radius: 14px; padding: 18px; margin-bottom: 12px; }
+    .card-title { font-size: 11px; font-weight: 700; color: #8ab880; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
+    .row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1e2e1a; align-items: center; }
+    .row:last-child { border-bottom: none; }
+    .row-label { font-size: 12px; color: #6b8a60; }
+    .row-val { font-size: 13px; color: #c8e0b8; font-weight: 600; }
+
+    /* BAR CHART */
+    .chart { display: flex; align-items: flex-end; gap: 6px; height: 70px; padding-top: 6px; }
+    .chart-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .chart-bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 4px; opacity: 0.85; }
+    .chart-lbl { font-size: 8px; color: #4a6a40; }
+
+    /* PROGRESS BAR */
+    .prog-wrap { height: 6px; background: #1e2e1a; border-radius: 3px; margin-top: 6px; }
+    .prog-bar { height: 100%; border-radius: 3px; }
+
+    /* BATIMENT CARD */
+    .bat-card { background: #1a2218; border: 1px solid #2d3d2a; border-radius: 14px; padding: 18px; margin-bottom: 10px; cursor: pointer; border-left-width: 4px; border-left-style: solid; }
+    .bat-name { font-size: 17px; font-weight: 700; color: #c8e0b8; }
+    .badge { font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* ALERT */
+    .alert-item { background: #1a2218; border-radius: 12px; padding: 16px; display: flex; gap: 12px; margin-bottom: 10px; border: 1px solid; }
+    .alert-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+
+    /* MODAL */
+    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: flex; align-items: flex-end; justify-content: center; z-index: 100; }
+    .modal { background: #1a2218; border: 1px solid #3a5a2c; border-radius: 20px 20px 0 0; padding: 24px; width: 100%; padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-title { font-size: 20px; font-weight: 700; color: #c8e0b8; }
+    .close-btn { background: none; border: none; color: #6b8a60; font-size: 24px; cursor: pointer; }
+    .btn-row { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-outline { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #3a5a2c; background: transparent; color: #9fd878; cursor: pointer; font-size: 14px; }
+    .btn-solid { flex: 1; padding: 12px; border-radius: 10px; border: none; background: linear-gradient(135deg, #7eb856, #4a8a2c); color: #fff; cursor: pointer; font-size: 14px; }
+
+    /* STOCK CARD */
+    .stock-card { background: #1a2218; border-radius: 14px; padding: 18px; }
+    .stock-val { font-size: 26px; font-weight: 700; margin-bottom: 10px; }
+
+    /* FILTER PILLS */
+    .pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .pill { padding: 6px 14px; border-radius: 20px; border: 1px solid #2d3d2a; background: transparent; color: #9fd878; cursor: pointer; font-size: 12px; font-family: Georgia, serif; }
+
+    /* SUPPLY BTN */
+    .supply-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    .supply-btn { padding: 8px 14px; border-radius: 8px; border: 1px solid #3a5a2c; background: transparent; color: #9fd878; cursor: pointer; font-size: 12px; font-family: Georgia, serif; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-icon">🐔</div>
+      <div class="logo-text">PINNACLE FARMS</div>
+    </div>
+    <div class="status-dot">● Actif</div>
+  </div>
+
+  <div class="page-header">
+    <div class="page-title" id="pageTitle">Tableau de bord</div>
+    <div class="page-date" id="pageDate"></div>
+  </div>
+
+  <div class="content" id="content"></div>
+
+  <nav class="bottomnav">
+    <button class="nav-btn active" onclick="nav('dashboard')" id="nav-dashboard">
+      <span class="nav-icon">⊞</span>Dashboard
+    </button>
+    <button class="nav-btn" onclick="nav('batiments')" id="nav-batiments">
+      <span class="nav-icon">🏚</span>Bâtiments
+    </button>
+    <button class="nav-btn" onclick="nav('sante')" id="nav-sante">
+      <span class="nav-icon">♥</span>Santé
+    </button>
+    <button class="nav-btn" onclick="nav('stocks')" id="nav-stocks">
+      <span class="nav-icon">▦</span>Stocks
+    </button>
+    <button class="nav-btn" onclick="nav('production')" id="nav-production">
+      <span class="nav-icon">📈</span>Production
+    </button>
+    <button class="nav-btn" onclick="nav('alertes')" id="nav-alertes">
+      <span class="nav-icon">⚠</span>Alertes
+      <span class="nav-badge">1</span>
+    </button>
+  </nav>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal" style="display:none">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title"></div>
+      <button class="close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body"></div>
+    <div class="btn-row">
+      <button class="btn-outline">Modifier</button>
+      <button class="btn-solid">Rapport</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  batiments: [
+    { id:1, nom:"Bâtiment A", capacite:5000, occupation:4800, age:32, race:"Ross 308", statut:"actif" },
+    { id:2, nom:"Bâtiment B", capacite:6000, occupation:5900, age:18, race:"Cobb 500", statut:"actif" },
+    { id:3, nom:"Bâtiment C", capacite:4500, occupation:0, age:0, race:"—", statut:"vide" },
+    { id:4, nom:"Bâtiment D", capacite:5500, occupation:5200, age:45, race:"Ross 308", statut:"récolte" },
+  ],
+  stocks: { aliment:12400, eau:98, medicaments:74, vaccins:88 },
+  alertes: [
+    { id:1, type:"danger", msg:"Bâtiment D: température élevée (32°C)", heure:"09:14" },
+    { id:2, type:"warning", msg:"Stock aliment sous 15 000 kg", heure:"08:30" },
+    { id:3, type:"info", msg:"Vaccination prévue Bâtiment B demain", heure:"07:00" },
+  ],
+  mortalites: [{d:"Lun",v:12},{d:"Mar",v:8},{d:"Mer",v:15},{d:"Jeu",v:6},{d:"Ven",v:10},{d:"Sam",v:9},{d:"Dim",v:7}],
+  productions: [{s:"S1",p:1.2},{s:"S2",p:1.8},{s:"S3",p:2.5},{s:"S4",p:3.1},{s:"S5",p:3.8},{s:"S6",p:4.4}],
+};
+
+let currentPage = 'dashboard';
+const TITLES = { dashboard:'Tableau de bord', batiments:'Bâtiments', sante:'Santé & Mortalité', stocks:'Stocks', production:'Production', alertes:'Alertes' };
+
+function nav(page) {
+  currentPage = page;
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('nav-' + page).classList.add('active');
+  document.getElementById('pageTitle').textContent = TITLES[page];
+  document.getElementById('content').scrollTop = 0;
+  render();
+}
+
+function setDate() {
+  const now = new Date();
+  document.getElementById('pageDate').textContent = now.toLocaleDateString('fr-FR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+}
+
+function barChart(data, keyX, keyY, color) {
+  const max = Math.max(...data.map(d => d[keyY]));
+  return `<div class="chart">${data.map(d => `
+    <div class="chart-col">
+      <div class="chart-bar" style="height:${Math.round(d[keyY]/max*56)}px;background:${color}"></div>
+      <div class="chart-lbl">${d[keyX]}</div>
+    </div>`).join('')}</div>`;
+}
+
+function kpi(icon, label, val, sub, color) {
+  return `<div class="kpi"><div class="kpi-icon">${icon}</div><div class="kpi-label">${label}</div><div class="kpi-val" style="color:${color}">${val}</div>${sub ? `<div class="kpi-sub">${sub}</div>` : ''}</div>`;
+}
+
+function statut_color(s) { return s==='actif'?'#7eb856':s==='récolte'?'#e67e22':'#4a6a40'; }
+function statut_bg(s) { return s==='actif'?'#1e3a15':s==='récolte'?'#3a2010':'#1e2e1a'; }
+
+function renderDashboard() {
+  const total = DATA.batiments.reduce((a,b) => a+b.occupation, 0);
+  const cap = DATA.batiments.reduce((a,b) => a+b.capacite, 0);
+  const taux = Math.round(total/cap*100);
+  const mort = DATA.mortalites[DATA.mortalites.length-1].v;
+  return `
+    <div class="grid2">
+      ${kpi('🐔','Total Poulets',total.toLocaleString(),'en élevage','#7eb856')}
+      ${kpi('⊞','Occupation',taux+'%','4 bâtiments','#5ba3d9')}
+      ${kpi('♥','Mortalité/jour',mort,'poulets',mort>10?'#e74c3c':'#7eb856')}
+      ${kpi('⚠','Alertes',1,'urgentes','#e67e22')}
+    </div>
+    <div class="card">
+      <div class="card-title">État des bâtiments</div>
+      ${DATA.batiments.map(b => `
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+            <span style="font-size:12px;color:#b0c8a0">${b.nom} — ${b.race}</span>
+            <span style="font-size:11px;color:#6b8a60">${b.occupation.toLocaleString()}/${b.capacite.toLocaleString()}</span>
+          </div>
+          <div class="prog-wrap"><div class="prog-bar" style="width:${Math.round(b.occupation/b.capacite*100)}%;background:${b.statut==='récolte'?'#e67e22':b.statut==='vide'?'#3d5a35':'linear-gradient(90deg,#7eb856,#4a8a2c)'}"></div></div>
+        </div>`).join('')}
+    </div>
+    <div class="card">
+      <div class="card-title">Alertes récentes</div>
+      ${DATA.alertes.map(a => `
+        <div class="row">
+          <div style="display:flex;gap:8px;align-items:flex-start">
+            <div style="width:8px;height:8px;border-radius:50%;background:${a.type==='danger'?'#e74c3c':a.type==='warning'?'#e67e22':'#5ba3d9'};margin-top:4px;flex-shrink:0"></div>
+            <div style="font-size:12px;color:#b0c8a0">${a.msg}<br><span style="font-size:10px;color:#4a6a40">${a.heure}</span></div>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="card">
+      <div class="card-title">Mortalité — 7 derniers jours</div>
+      ${barChart(DATA.mortalites.map(d=>({date:d.d,val:d.v})),'date','val','#e74c3c')}
+    </div>
+    <div class="card">
+      <div class="card-title">Poids moyen (kg) par semaine</div>
+      ${barChart(DATA.productions.map(d=>({semaine:d.s,poids:d.p})),'semaine','poids','#7eb856')}
+    </div>`;
+}
+
+function renderBatiments() {
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <span style="color:#6b8a60;font-size:13px">${DATA.batiments.length} bâtiments</span>
+      <button class="btn-solid" style="padding:8px 16px;font-size:13px">+ Nouveau</button>
+    </div>
+    ${DATA.batiments.map(b => `
+      <div class="bat-card" style="border-left-color:${statut_color(b.statut)}" onclick="openBat(${b.id})">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <span class="bat-name">${b.nom}</span>
+          <span class="badge" style="background:${statut_bg(b.statut)};color:${statut_color(b.statut)}">${b.statut}</span>
+        </div>
+        <div style="font-size:12px;color:#6b8a60;margin-bottom:8px">Race: <span style="color:#b0c8a0">${b.race}</span></div>
+        ${b.occupation>0 ? `
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:11px;color:#6b8a60">
+            <span>${b.occupation.toLocaleString()} poulets</span><span>${Math.round(b.occupation/b.capacite*100)}%</span>
+          </div>
+          <div class="prog-wrap"><div class="prog-bar" style="width:${Math.round(b.occupation/b.capacite*100)}%;background:${b.statut==='récolte'?'#e67e22':'linear-gradient(90deg,#7eb856,#4a8a2c)'}"></div></div>
+          <div style="font-size:11px;color:#5a7a50;margin-top:8px">Âge: ${b.age} jours</div>`
+        : `<div style="color:#3d5a35;font-size:12px">Bâtiment vide — prêt pour un nouveau lot</div>`}
+      </div>`).join('')}`;
+}
+
+function renderSante() {
+  return `
+    <div class="grid2">
+      ${kpi('♥','Mortalité 7j',DATA.mortalites.reduce((a,b)=>a+b.v,0),'total','#e74c3c')}
+      ${kpi('%','Taux mortalité','0.12%','sous le seuil','#7eb856')}
+      ${kpi('💉','Vaccinations',2,'à venir','#5ba3d9')}
+      ${kpi('💊','Traitements',1,'actif','#e67e22')}
+    </div>
+    <div class="card">
+      <div class="card-title">Mortalité par bâtiment</div>
+      ${DATA.batiments.filter(b=>b.occupation>0).map(b=>`
+        <div class="row"><span class="row-label">${b.nom}</span><span class="row-val" style="color:#7eb856">${Math.floor(Math.random()*12+2)} cette semaine</span></div>`).join('')}
+    </div>
+    <div class="card">
+      <div class="card-title">Calendrier sanitaire</div>
+      ${[
+        {date:'05 juin',action:'Vaccination Newcastle — Bât. B'},
+        {date:'10 juin',action:'Contrôle vétérinaire général'},
+        {date:'15 juin',action:'Antiparasitaire — Bât. A'},
+      ].map(e=>`
+        <div class="row">
+          <span style="background:#1e3a15;color:#7eb856;font-size:11px;padding:3px 8px;border-radius:6px;flex-shrink:0">${e.date}</span>
+          <span style="font-size:12px;color:#b0c8a0;margin-left:10px">${e.action}</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderStocks() {
+  const items = [
+    {label:'Aliment (kg)',val:DATA.stocks.aliment,max:20000,icon:'🌾',seuil:5000},
+    {label:'Eau (%)',val:DATA.stocks.eau,max:100,icon:'💧',seuil:20},
+    {label:'Médicaments (%)',val:DATA.stocks.medicaments,max:100,icon:'💊',seuil:20},
+    {label:'Vaccins (%)',val:DATA.stocks.vaccins,max:100,icon:'💉',seuil:20},
+  ];
+  return `
+    <div class="grid2">
+      ${items.map(item => {
+        const pct = Math.round(item.val/item.max*100);
+        const low = item.val<=item.seuil;
+        return `<div class="stock-card" style="border:1px solid ${low?'#c0392b':'#2d3d2a'}">
+          <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+            <span style="font-size:22px">${item.icon}</span>
+            ${low?'<span style="background:#3a1010;color:#e74c3c;font-size:10px;padding:2px 8px;border-radius:10px">Bas</span>':''}
+          </div>
+          <div style="font-size:11px;color:#6b8a60;margin-bottom:4px">${item.label}</div>
+          <div class="stock-val" style="color:${low?'#e74c3c':'#c8e0b8'}">${item.val.toLocaleString()}${item.max===100?'%':''}</div>
+          <div class="prog-wrap"><div class="prog-bar" style="width:${pct}%;background:${low?'#c0392b':'linear-gradient(90deg,#7eb856,#4a8a2c)'}"></div></div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="card">
+      <div class="card-title">Commander des fournitures</div>
+      <div class="supply-btns">
+        ${['Aliment','Médicaments','Vaccins','Matériel'].map(f=>`<button class="supply-btn">Commander ${f}</button>`).join('')}
+      </div>
+    </div>`;
+}
+
+function renderProduction() {
+  return `
+    <div class="grid2">
+      ${kpi('⚖','Poids moyen','4.4 kg','semaine 6','#7eb856')}
+      ${kpi('📦','Prêts à récolter',1,'Bâtiment D','#e67e22')}
+    </div>
+    <div class="kpi" style="margin-bottom:12px">${kpi('💰','Revenu estimé lot actuel','2 840 000 FCFA','','#5ba3d9')}</div>
+    <div class="card">
+      <div class="card-title">Courbe de croissance (Bât. A)</div>
+      ${barChart(DATA.productions.map(d=>({semaine:d.s,poids:d.p})),'semaine','poids','#7eb856')}
+      <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:11px;color:#4a6a40">
+        <span>Objectif: 4.5 kg à S6</span><span style="color:#7eb856">✓ En bonne voie</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Historique des lots</div>
+      ${[
+        {lot:'Lot #14',bat:'Bât. B',date:'Fév 2024',poids:'4.2 kg',rev:'2 520 000 F'},
+        {lot:'Lot #13',bat:'Bât. A',date:'Jan 2024',poids:'4.5 kg',rev:'2 700 000 F'},
+        {lot:'Lot #12',bat:'Bât. D',date:'Déc 2023',poids:'4.0 kg',rev:'2 400 000 F'},
+      ].map(l=>`
+        <div class="row">
+          <div><div style="font-size:13px;color:#c8e0b8;font-weight:600">${l.lot} — ${l.bat}</div><div style="font-size:11px;color:#4a6a40;margin-top:2px">${l.date} · ${l.poids}</div></div>
+          <div style="font-size:13px;color:#7eb856;font-weight:600">${l.rev}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderAlertes() {
+  return `
+    <div class="pills">
+      ${['Toutes','Danger','Avertissement','Info'].map(f=>`<button class="pill">${f}</button>`).join('')}
+    </div>
+    ${DATA.alertes.map(a => `
+      <div class="alert-item" style="border-color:${a.type==='danger'?'#c0392b':a.type==='warning'?'#8a5a1a':'#1a3a5a'}">
+        <div class="alert-icon" style="background:${a.type==='danger'?'#3a1010':a.type==='warning'?'#3a2010':'#102030'}">
+          ${a.type==='danger'?'🚨':a.type==='warning'?'⚠️':'ℹ️'}
+        </div>
+        <div style="flex:1">
+          <div style="font-size:13px;color:#c8e0b8;margin-bottom:4px">${a.msg}</div>
+          <div style="font-size:11px;color:#4a6a40">Aujourd'hui à ${a.heure}</div>
+        </div>
+        <button style="padding:6px 10px;border-radius:6px;border:1px solid #2d3d2a;background:transparent;color:#6b8a60;cursor:pointer;font-size:11px;flex-shrink:0;font-family:Georgia,serif">Résoudre</button>
+      </div>`).join('')}`;
+}
+
+function render() {
+  const c = document.getElementById('content');
+  if (currentPage==='dashboard') c.innerHTML = renderDashboard();
+  else if (currentPage==='batiments') c.innerHTML = renderBatiments();
+  else if (currentPage==='sante') c.innerHTML = renderSante();
+  else if (currentPage==='stocks') c.innerHTML = renderStocks();
+  else if (currentPage==='production') c.innerHTML = renderProduction();
+  else if (currentPage==='alertes') c.innerHTML = renderAlertes();
+}
+
+function openBat(id) {
+  const b = DATA.batiments.find(x => x.id===id);
+  document.getElementById('modal-title').textContent = b.nom;
+  document.getElementById('modal-body').innerHTML = `
+    <div class="row"><span class="row-label">Race</span><span class="row-val">${b.race}</span></div>
+    <div class="row"><span class="row-label">Capacité</span><span class="row-val">${b.capacite.toLocaleString()} poulets</span></div>
+    <div class="row"><span class="row-label">Occupation</span><span class="row-val">${b.occupation.toLocaleString()} (${Math.round(b.occupation/b.capacite*100)}%)</span></div>
+    <div class="row"><span class="row-label">Âge</span><span class="row-val">${b.age>0?b.age+' jours':'—'}</span></div>
+    <div class="row"><span class="row-label">Statut</span><span class="row-val" style="color:${statut_color(b.statut)}">${b.statut}</span></div>`;
+  document.getElementById('modal').style.display = 'flex';
+}
+
+function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+// Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    const sw = `
+const CACHE='pf-v1';
+self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.add('/'))));
+self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('/')))));
+`;
+    const blob = new Blob([sw], {type:'application/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+  });
+}
+
+setDate();
+render();
+</script>
+</body>
+</html>
